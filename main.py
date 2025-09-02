@@ -1,4 +1,4 @@
-mport scratchattach as sa
+import scratchattach as sa # pyright: ignore[reportMissingImports]
 import signal
 import sys
 import random
@@ -19,19 +19,9 @@ _http_session = requests.Session()
 
 def get_random_user() -> Optional[sa.User]:
     """Find a random user by probing for a valid project."""
-    author = None
-    while not author:
-        project_id = random.randint(100_000_000, 1_180_630_143)
-        try:
-            project = sa.get_project(project_id)
-            # Check if project is valid
-            if isinstance(project, (sa.Project)):
-                author = project.author()
-                print(f"Found project {project_id}, author={author.username!r}")
-                return author
-        except sa.utils.exceptions.ProjectNotFound:
-            continue
-    return None
+    user = session.connect_user_by_id(random.randint(1, 159767440))
+    print("Found User",user.id)
+    return user
 
 
 def fetch_profile_hex(user: sa.User) -> str:
@@ -41,7 +31,7 @@ def fetch_profile_hex(user: sa.User) -> str:
     resp.raise_for_status()
     data = resp.content
 
-    image = Image.open(BytesIO(data)).resize((24, 24), Image.LANCZOS).convert("RGB")
+    image = Image.open(BytesIO(data)).resize((50, 50), Image.LANCZOS).convert("RGB")
     return image.tobytes().hex().upper()
 
 
@@ -67,6 +57,4 @@ def on_ready() -> None:
 
 
 if __name__ == "__main__":
-    client.start()
-    while True:
-        time.sleep(5)
+    client.start(thread=False)
