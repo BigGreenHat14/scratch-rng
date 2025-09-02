@@ -19,9 +19,12 @@ _http_session = requests.Session()
 
 def get_random_user() -> Optional[sa.User]:
     """Find a random user by probing for a valid project."""
-    user = session.connect_user_by_id(random.randint(1, 159767440))
-    print("Found User",user.id)
-    return user
+    try:
+        user = session.connect_user_by_id(random.randint(1, 159767440))
+        print("Found User",user.id)
+        return user
+    except:
+        return None
 
 
 def fetch_profile_hex(user: sa.User) -> str:
