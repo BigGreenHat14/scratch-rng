@@ -1,4 +1,4 @@
-mport scratchattach as sa
+import scratchattach as sa
 import signal
 import sys
 import random
