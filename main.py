@@ -22,7 +22,7 @@ _http_session = requests.Session()
 def get_random_user() -> Optional[sa.User]:
     """Find a random user by probing for a valid project."""
     author = None
-    while not author:
+    while author == None:
         project_id = random.randint(100_000_000, 1_180_630_143)
         try:
             project = sa.get_project(project_id)
@@ -43,7 +43,7 @@ def fetch_profile_hex(user: sa.User) -> str:
     resp.raise_for_status()
     data = resp.content
 
-    image = Image.open(BytesIO(data)).resize((50, 50), Image.LANCZOS).convert("RGB")
+    image = Image.open(BytesIO(data)).resize((24, 24), Image.LANCZOS).convert("RGB")
     return image.tobytes().hex().upper()
 
 
