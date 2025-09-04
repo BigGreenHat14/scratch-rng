@@ -1,4 +1,4 @@
-import scratchattach as sa # pyright: ignore[reportMissingImports]
+import scratchattach as sa
 import signal
 import sys
 import random
@@ -19,28 +19,35 @@ _http_session = requests.Session()
 
 def get_random_user() -> Optional[sa.User]:
     """Find a random user by probing for a valid project."""
-    try:
-        user = session.connect_user_by_id(random.randint(1, 159767440))
-        print("Found User",user.id)
-        return user
-    except:
-        return None
+    author = None
+    while not author:
+        project_id = random.randint(100_000_000, 1_100_000_000)
+        try:
+            project = sa.get_project(project_id)
+            # Check if project is valid
+            if isinstance(project, (sa.Project)):
+                author = project.author()
+                print(f"Found project {project_id}, author={author.username!r}")
+                return author
+        except sa.utils.exceptions.ProjectNotFound:
+            continue
+    return None
 
 
 def fetch_profile_hex(user: sa.User) -> str:
-    """Downloads avatar, converts to 50x50 RGB hex string."""
+    """Downloads avatar, converts to 24x24 RGB hex string."""
     url = f"https://uploads.scratch.mit.edu/get_image/user/{user.id}_24x24.png"
     resp = _http_session.get(url)
     resp.raise_for_status()
     data = resp.content
 
-    image = Image.open(BytesIO(data)).resize((50, 50), Image.LANCZOS).convert("RGB")
+    image = Image.open(BytesIO(data)).resize((24, 24), Image.LANCZOS).convert("RGB")
     return image.tobytes().hex().upper()
 
 
 @client.request
 def ping() -> str:
-    print("Ping received")
+    print("Ping request received")
     return "pong"
 
 
@@ -48,7 +55,7 @@ def ping() -> str:
 def roll() -> list[str]:
     user = get_random_user()
     if user is None:
-        return ["", "Shutdown"]
+        return ["", "Error caught"]
     hex_str = fetch_profile_hex(user)
     print(f"Fetched {len(hex_str)} hex chars for {user.username!r}")
     return [hex_str, user.username]
@@ -60,4 +67,6 @@ def on_ready() -> None:
 
 
 if __name__ == "__main__":
-    client.start(thread=False)
+    client.start()
+    while True:
+        time.sleep(5)
