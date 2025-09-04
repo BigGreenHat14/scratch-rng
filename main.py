@@ -35,7 +35,7 @@ def get_random_user() -> Optional[sa.User]:
 
 
 def fetch_profile_hex(user: sa.User) -> str:
-    """Downloads avatar, converts to 50x50 RGB hex string."""
+    """Downloads avatar, converts to 24x24 RGB hex string."""
     url = f"https://uploads.scratch.mit.edu/get_image/user/{user.id}_24x24.png"
     resp = _http_session.get(url)
     resp.raise_for_status()
@@ -47,7 +47,7 @@ def fetch_profile_hex(user: sa.User) -> str:
 
 @client.request
 def ping() -> str:
-    print("Ping received")
+    print("Ping request received")
     return "pong"
 
 
